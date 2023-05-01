@@ -83,7 +83,10 @@ class EdgeConnect():
         keep_training = True
         model = self.config.MODEL
         max_iteration = int(float((self.config.MAX_ITERS)))
+        iteration = 0
         total = len(self.train_dataset)
+
+        print(max_iteration)
 
         if total == 0:
             print('No training data was provided! Check \'TRAIN_FLIST\' value in the configuration file.')
@@ -92,10 +95,12 @@ class EdgeConnect():
         while(keep_training):
             epoch += 1
             print('\n\nTraining epoch: %d' % epoch)
+            print('\n\nTraining iteration: %d' % iteration)
 
             progbar = Progbar(total, width=20, stateful_metrics=['epoch', 'iter'])
 
             for items in train_loader:
+                print("DEBUGUUU")
                 self.edge_model.train()
                 self.inpaint_model.train()
 
@@ -114,7 +119,7 @@ class EdgeConnect():
                     # backward
                     self.edge_model.backward(gen_loss, dis_loss)
                     iteration = self.edge_model.iteration
-
+                    print(f"debug iter: {iteration}")
 
                 # inpaint model
                 elif model == 2:

@@ -87,19 +87,19 @@ class Dataset(torch.utils.data.Dataset):
 
         # in test mode images are masked (with masked regions),
         # using 'mask' parameter prevents canny to detect edges for the masked regions
-        mask = None if self.training else (1 - mask / 255).astype(np.bool)
+        mask = None if self.training else (1 - mask / 255).astype(np.bool_)
 
         # canny
         if self.edge == 1:
             # no edge
             if sigma == -1:
-                return np.zeros(img.shape).astype(np.float)
+                return np.zeros(img.shape).astype(np.single)
 
             # random sigma
             if sigma == 0:
                 sigma = random.randint(1, 4)
 
-            return canny(img, sigma=sigma, mask=mask).astype(np.float)
+            return canny(img, sigma=sigma, mask=mask).astype(np.single)
 
         # external
         else:
@@ -165,7 +165,7 @@ class Dataset(torch.utils.data.Dataset):
             i = (imgw - side) // 2
             img = img[j:j + side, i:i + side, ...]
 
-        img = scipy.misc.imresize(img, [height, width])
+        img = np.asarray(Image.fromarray(img).resize((height, width)))
 
         return img
 
@@ -176,14 +176,21 @@ class Dataset(torch.utils.data.Dataset):
         # flist: image file path, image directory path, text file flist path
         if isinstance(flist, str):
             if os.path.isdir(flist):
-                flist = list(glob.glob(flist + '/*.jpg')) + list(glob.glob(flist + '/*.png'))
+                flist_path = flist
+                flist = list(glob.glob(flist_path + '/*.jpg'))
+                flist.extend(list(glob.glob(flist_path + '/*.png')))
+                flist.extend(list(glob.glob(flist_path + '/*.tif')))
+                flist.extend(list(glob.glob(flist_path + '/*.tif')))
+                flist.extend(list(glob.glob(flist_path + '/*.TIF')))
+                flist.extend(list(glob.glob(flist_path + '/*.TIFF')))
                 flist.sort()
                 return flist
 
             if os.path.isfile(flist):
                 try:
-                    return np.genfromtxt(flist, dtype=np.str, encoding='utf-8')
-                except:
+                    return np.genfromtxt(flist, dtype=str, encoding='utf-8')
+                except Exception as e:
+                    print(e)
                     return [flist]
 
         return []

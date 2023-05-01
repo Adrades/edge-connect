@@ -20,6 +20,7 @@ pyaml = "^21.10.1"
 torch = "^1.13.1"
 torchvision = "^0.14.1"
 imageio = "^2.25.0"
+imagecodecs = "^2023.3.16"
 
 
 [build-system]
